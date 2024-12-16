@@ -1,0 +1,11 @@
+raspberries:
+  hosts:
+    jujuwu:
+      # IP address to connect to the host.
+      ansible_host: 192.168.1.115
+      # Username to connect to the host (must have sudo rights).
+      ansible_user: "skytasul"
+      # Interface that is connected to the Internet.
+      wan_iface: "eth0"
+      # Interface that will be used to connect to the local devices.
+      lan_iface: "eth1" 

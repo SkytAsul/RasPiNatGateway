@@ -1,0 +1,8 @@
+[Match]
+Name={{lan_iface}}
+
+[Network]
+DHCP=no
+Address=192.168.2.1/24
+LinkLocalAddressing=ipv4
+IPv6AcceptRA=no

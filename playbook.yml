@@ -1,0 +1,60 @@
+- name: Setup Raspberry Pi as a NAT gateway
+  hosts: raspberries
+  become: true
+  tasks:
+    - name: Install required packages
+      ansible.builtin.package:
+        name:
+          - dnsmasq
+        state: present
+    - name: Copy dnsmasq configuration
+      ansible.builtin.template:
+        src: templates/dnsmasq.conf
+        dest: /etc/dnsmasq.conf
+        owner: root
+        group: root
+    - name: Enable dnsmasq service
+      ansible.builtin.systemd_service:
+        name: dnsmasq
+        enabled: true
+    - name: Copy nftables configuration
+      ansible.builtin.template:
+        src: templates/nftables.conf
+        dest: /etc/nftables.conf
+        owner: root
+        group: root
+    - name: Enable nftables service
+      ansible.builtin.systemd_service:
+        name: nftables
+        enabled: true
+    - name: Configure system to allow IP forwarding and disable IPv6
+      ansible.builtin.copy:
+        src: files/sysctl.conf
+        dest: /etc/sysctl.conf
+        owner: root
+        group: root
+        backup: yes
+    - name: Copy systemd-networkd WAN configuration
+      ansible.builtin.template:
+        src: templates/network/01-wan.network
+        dest: /etc/systemd/network/01-wan.network
+        owner: root
+        group: root
+    - name: Copy systemd-networkd LAN configuration
+      ansible.builtin.template:
+        src: templates/network/02-lan.network
+        dest: /etc/systemd/network/02-lan.network
+        owner: root
+        group: root
+    - name: Enable systemd-networkd service
+      ansible.builtin.systemd_service:
+        name: systemd-networkd
+        enabled: true
+    - name: Uninstall now useless packages
+      ansible.builtin.package:
+        name:
+          - network-manager
+          - isc-dhcp-client
+        state: absent
+    - name: Reboot
+      ansible.builtin.reboot:
